@@ -20,7 +20,6 @@ __language__  = __addon__.getLocalizedString
 def displayEpisodeList(episodeList):
   for episode in episodeList:
     label = u"[%s] - S%02dE%02d - %s"%(episode['firstAired'], int(episode['season']), int(episode['episode']), episode['title'])
-    print label
     li = xbmcgui.ListItem(label, iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=base_url, listitem=li, isFolder=False)
   xbmcplugin.endOfDirectory(addon_handle)
