@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.tv.show.last.episode" name="TV Show - Last episode" version="1.0.0" provider-name="mbartel">
+	<requires>
+		<import addon="xbmc.python" version="2.1.0"/>
+	</requires>
+	<extension point="xbmc.python.pluginsource" library="default.py">
+		<provides>executable</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<platform>all</platform>
+		<language/>
+		<summary lang="de">Zeigt eine Liste der letzten Episode jeder Serie.</summary>
+		<summary lang="en">Shows a list with the last episode of each series.</summary>
+		<description lang="de">Zeigt eine Liste mit den Episoden Nummern und Namen von jeder Serie in der Bibliothek.</description>
+		<description lang="en">Shows a list with the number and name of the last episode of each series in the library.</description>
+		<platform>all</platform>
+		<forum></forum>
+		<source></source>
+	</extension>
+</addon>

@@ -1,0 +1,5 @@
+v1.0.0 (2014-03-03):
+- Use database instead of file system
+
+v0.0.1 (2014-02-27):
+- Initial commit
