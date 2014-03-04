@@ -50,5 +50,5 @@ def get_tv_show_list():
     episodeList.append({ 'title': tvshow[1], 'season': tvshow[2], 'episode': get_last_episode(conn, tvshow[0], tvshow[2]) })
   return episodeList
 
-displayEpisodeList(get_tv_show_list())
+display_episode_list(get_tv_show_list())
 
