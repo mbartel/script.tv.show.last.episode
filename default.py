@@ -2,12 +2,12 @@ import sqlite3
 import sys, unicodedata, urlparse
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs, xbmcplugin
 
-
 base_url = sys.argv[0]
 addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 
-xbmcplugin.setContent(addon_handle, 'movies')
+# files, songs, artists, albums, movies, tvshows, episodes, musicvideos
+xbmcplugin.setContent(addon_handle, 'tvshows')
 
 __addon__     = xbmcaddon.Addon()
 __addonid__   = __addon__.getAddonInfo('id')
@@ -40,7 +40,7 @@ def get_last_episode(conn, idShow, season):
 
 
 def get_tv_show_list():
-  tvshowQuery = 'SELECT idShow, strTitle, MAX(CAST(c12 AS INTEGER)) FROM episodeview GROUP BY idShow ORDER BY strTitle'
+  tvshowQuery = 'SELECT idShow, strTitle, MAX(CAST(c12 AS INTEGER)) FROM episodeview GROUP BY idShow'
   conn = sqlite3.connect(get_database_file())
   cursor = conn.cursor()
   tvshows = cursor.execute(tvshowQuery)
@@ -50,5 +50,29 @@ def get_tv_show_list():
     episodeList.append({ 'title': tvshow[1], 'season': tvshow[2], 'episode': get_last_episode(conn, tvshow[0], tvshow[2]) })
   return episodeList
 
-display_episode_list(get_tv_show_list())
+def display_sort_order_selection():
+  xbmcplugin.addDirectoryItem(
+    handle=addon_handle,
+    url=base_url + '?order=firstAired',
+    listitem=xbmcgui.ListItem('Sort by first aired date', iconImage='DefaultFolder.png'), 
+    isFolder=True
+  )
+  xbmcplugin.addDirectoryItem(
+    handle=addon_handle,
+    url=base_url + '?order=seriesTitle',
+    listitem=xbmcgui.ListItem('Sort by TV show title', iconImage='DefaultFolder.png'), 
+    isFolder=True
+  )
+  xbmcplugin.endOfDirectory(addon_handle)
+
+if args:
+  order = args['order'][0]
+  unsortedEpisodeList = get_tv_show_list()
+  if order in 'seriesTitle':
+    sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['title'])
+  if order in 'firstAired':
+    sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['episode']['firstAired'], reverse=True)
+  display_episode_list(sortedEpisodeList)
+else:
+  display_sort_order_selection()
 
