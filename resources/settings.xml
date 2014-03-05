@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <setting type="enum" id="sortOrder" label="Order TV shows by" values="ask each time|TV show title|first aired date"/>
+</settings>

@@ -14,7 +14,8 @@
 		<description lang="de">Zeigt eine Liste mit den Episoden Nummern und Namen von jeder Serie in der Bibliothek.</description>
 		<description lang="en">Shows a list with the number and name of the last episode of each series in the library.</description>
 		<platform>all</platform>
-		<forum></forum>
-		<source></source>
+		<source>https://github.com/mbartel/script.tv.show.last.episode</source>
+        <website>https://github.com/mbartel/script.tv.show.last.episode</website>
+        <email>Michael.Bartel@gmx.net</email>
 	</extension>
 </addon>

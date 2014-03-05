@@ -9,12 +9,12 @@ args = urlparse.parse_qs(sys.argv[2][1:])
 # files, songs, artists, albums, movies, tvshows, episodes, musicvideos
 xbmcplugin.setContent(addon_handle, 'tvshows')
 
-__addon__     = xbmcaddon.Addon()
-__addonid__   = __addon__.getAddonInfo('id')
-__addonname__ = __addon__.getAddonInfo('name')
-__author__    = __addon__.getAddonInfo('author')
-__version__   = __addon__.getAddonInfo('version')
-__language__  = __addon__.getLocalizedString
+addon     = xbmcaddon.Addon('script.tv.show.last.episode')
+#__addonid__   = __addon__.getAddonInfo('id')
+#__addonname__ = __addon__.getAddonInfo('name')
+#__author__    = __addon__.getAddonInfo('author')
+#__version__   = __addon__.getAddonInfo('version')
+#__language__  = __addon__.getLocalizedString
 
 
 def display_episode_list(seriesList):
@@ -65,8 +65,18 @@ def display_sort_order_selection():
   )
   xbmcplugin.endOfDirectory(addon_handle)
 
+# check settings
 if args:
   order = args['order'][0]
+else:
+  order = None
+  if addon.getSetting('sortOrder') == '1':
+    order = 'seriesTitle'
+  if addon.getSetting('sortOrder') == '2':
+    order = 'firstAired'
+
+# sort tv show list
+if order:
   unsortedEpisodeList = get_tv_show_list()
   if order in 'seriesTitle':
     sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['title'])
