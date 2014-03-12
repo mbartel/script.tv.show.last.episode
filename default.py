@@ -54,19 +54,19 @@ def display_sort_order_selection():
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
     url=base_url + '?order=firstAired',
-    listitem=xbmcgui.ListItem('Sort by first aired date', iconImage='DefaultFolder.png'), 
+    listitem=xbmcgui.ListItem('Sort by first aired date', iconImage='/home/mbartel/www/xbmc/script.tv.show.last.episode/calendar.png', thumbnailImage='/home/mbartel/www/xbmc/script.tv.show.last.episode/calendar.png'), 
     isFolder=True
   )
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
     url=base_url + '?order=seriesTitle',
-    listitem=xbmcgui.ListItem('Sort by TV show title', iconImage='DefaultFolder.png'), 
+    listitem=xbmcgui.ListItem('Sort by TV show title', iconImage='keyboard.png'), 
     isFolder=True
   )
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
     url=base_url + '?order=dateAdded',
-    listitem=xbmcgui.ListItem('Sort by added to library date', iconImage='DefaultFolder.png'), 
+    listitem=xbmcgui.ListItem('Sort by added to library date', iconImage='plus-circle.png'), 
     isFolder=True
   )
   xbmcplugin.endOfDirectory(addon_handle)
