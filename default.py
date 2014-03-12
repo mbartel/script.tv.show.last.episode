@@ -20,7 +20,7 @@ addon     = xbmcaddon.Addon('script.tv.show.last.episode')
 def display_episode_list(seriesList):
   for series in seriesList:
     episode = series['episode']
-    label = u"S%02dE%02d - %s (%s, %s)"%(int(series['season']), int(episode['number']), series['title'], episode['title'], episode['firstAired'])
+    label = u"S%02dE%02d - %s (%s, aired: %s, added: %s)"%(int(series['season']), int(episode['number']), series['title'], episode['title'], episode['firstAired'], episode['dateAdded'][:10])
     li = xbmcgui.ListItem(label, iconImage='DefaultFolder.png')
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=base_url, listitem=li, isFolder=False)
   xbmcplugin.endOfDirectory(addon_handle)
@@ -32,11 +32,11 @@ def get_database_file():
       return xbmc.translatePath('special://database/' + file)
 
 def get_last_episode(conn, idShow, season):
-  episodeQuery = 'SELECT MAX(CAST(c13 AS INTEGER)), c00, c05 FROM episodeview WHERE idShow = ? AND c12 = ?'
+  episodeQuery = 'SELECT MAX(CAST(c13 AS INTEGER)), c00, c05, dateAdded FROM episodeview WHERE idShow = ? AND c12 = ?'
   cursor = conn.cursor()
   cursor.execute(episodeQuery, (idShow, season))
   episode = cursor.fetchone()
-  return { 'number': episode[0], 'title': episode[1], 'firstAired': episode[2] }
+  return { 'number': episode[0], 'title': episode[1], 'firstAired': episode[2], 'dateAdded': episode[3] }
 
 
 def get_tv_show_list():
@@ -63,6 +63,12 @@ def display_sort_order_selection():
     listitem=xbmcgui.ListItem('Sort by TV show title', iconImage='DefaultFolder.png'), 
     isFolder=True
   )
+  xbmcplugin.addDirectoryItem(
+    handle=addon_handle,
+    url=base_url + '?order=dateAdded',
+    listitem=xbmcgui.ListItem('Sort by added to library date', iconImage='DefaultFolder.png'), 
+    isFolder=True
+  )
   xbmcplugin.endOfDirectory(addon_handle)
 
 # check settings
@@ -70,10 +76,13 @@ if args:
   order = args['order'][0]
 else:
   order = None
-  if addon.getSetting('sortOrder') == '1':
+  addOnSetting = addon.getSetting('sortOrder')
+  if addOnSetting == '1':
     order = 'seriesTitle'
-  if addon.getSetting('sortOrder') == '2':
+  if addOnSetting == '2':
     order = 'firstAired'
+  if addOnSetting == '3':
+    order = 'dateAdded'
 
 # sort tv show list
 if order:
@@ -82,6 +91,8 @@ if order:
     sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['title'])
   if order in 'firstAired':
     sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['episode']['firstAired'], reverse=True)
+  if order in 'dateAdded':
+    sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['episode']['dateAdded'], reverse=True)
   display_episode_list(sortedEpisodeList)
 else:
   display_sort_order_selection()
