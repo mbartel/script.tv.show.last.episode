@@ -6,16 +6,10 @@ base_url = sys.argv[0]
 addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 
-# files, songs, artists, albums, movies, tvshows, episodes, musicvideos
 xbmcplugin.setContent(addon_handle, 'tvshows')
 
-addon     = xbmcaddon.Addon('script.tv.show.last.episode')
-#__addonid__   = __addon__.getAddonInfo('id')
-#__addonname__ = __addon__.getAddonInfo('name')
-#__author__    = __addon__.getAddonInfo('author')
-#__version__   = __addon__.getAddonInfo('version')
-#__language__  = __addon__.getLocalizedString
-
+addon = xbmcaddon.Addon('script.tv.show.last.episode')
+path = addon.getAddonInfo('path')
 
 def display_episode_list(seriesList):
   for series in seriesList:
@@ -51,22 +45,32 @@ def get_tv_show_list():
   return episodeList
 
 def display_sort_order_selection():
+  fanart = addon.getAddonInfo('fanart')
+
+  firstAired = xbmcgui.ListItem('Sort by first aired date', iconImage=path + '/resources/media/calendar.png')
+  firstAired.setProperty('fanart_image', fanart)
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
     url=base_url + '?order=firstAired',
-    listitem=xbmcgui.ListItem('Sort by first aired date', iconImage='/home/mbartel/www/xbmc/script.tv.show.last.episode/calendar.png', thumbnailImage='/home/mbartel/www/xbmc/script.tv.show.last.episode/calendar.png'), 
+    listitem=firstAired, 
     isFolder=True
   )
+
+  seriesTitle = xbmcgui.ListItem('Sort by TV show title', iconImage=path + '/resources/media/keyboard.png')
+  seriesTitle.setProperty('fanart_image', fanart)
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
     url=base_url + '?order=seriesTitle',
-    listitem=xbmcgui.ListItem('Sort by TV show title', iconImage='keyboard.png'), 
+    listitem=seriesTitle, 
     isFolder=True
   )
+
+  dateAdded = xbmcgui.ListItem('Sort by added to library date', iconImage=path + '/resources/media/plus-circle.png')
+  dateAdded.setProperty('fanart_image', fanart)
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
     url=base_url + '?order=dateAdded',
-    listitem=xbmcgui.ListItem('Sort by added to library date', iconImage='plus-circle.png'), 
+    listitem=dateAdded, 
     isFolder=True
   )
   xbmcplugin.endOfDirectory(addon_handle)
