@@ -47,7 +47,7 @@ def get_tv_show_list():
 def display_sort_order_selection():
   fanart = addon.getAddonInfo('fanart')
 
-  firstAired = xbmcgui.ListItem('Sort by first aired date', iconImage=path + '/resources/media/calendar.png')
+  firstAired = xbmcgui.ListItem(addon.getLocalizedString(32001), iconImage=path + '/resources/media/calendar.png')
   firstAired.setProperty('fanart_image', fanart)
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
@@ -56,7 +56,7 @@ def display_sort_order_selection():
     isFolder=True
   )
 
-  seriesTitle = xbmcgui.ListItem('Sort by TV show title', iconImage=path + '/resources/media/keyboard.png')
+  seriesTitle = xbmcgui.ListItem(addon.getLocalizedString(32002), iconImage=path + '/resources/media/keyboard.png')
   seriesTitle.setProperty('fanart_image', fanart)
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
@@ -65,7 +65,7 @@ def display_sort_order_selection():
     isFolder=True
   )
 
-  dateAdded = xbmcgui.ListItem('Sort by added to library date', iconImage=path + '/resources/media/plus-circle.png')
+  dateAdded = xbmcgui.ListItem(addon.getLocalizedString(32003), iconImage=path + '/resources/media/plus-circle.png')
   dateAdded.setProperty('fanart_image', fanart)
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
