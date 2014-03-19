@@ -21,14 +21,15 @@ def jsonrpc(method, resultKey, params):
 
 def get_tv_show_list():
   tvshows = jsonrpc('VideoLibrary.GetTVShows', 'tvshows', '{ "properties": ["title", "thumbnail"] }, "id": "libTvShows"}')
-  result = []
+  tvshowList = []
   for tvshow in tvshows:
     episodes = jsonrpc(
       'VideoLibrary.GetEpisodes',
       'episodes',
-      '{"tvshowid": %d, "properties": ["title", "season", "episode", "firstaired", "thumbnail"]}'%tvshow['tvshowid']
+      '{"tvshowid": %d, "properties": ["title", "season", "episode", "firstaired"]}'%tvshow['tvshowid']
     )
 
+    lastEpisode = None
     lastSeasonNr = 0
     lastEpisodeNr = 0
     for episode in episodes:
@@ -40,17 +41,20 @@ def get_tv_show_list():
           lastEpisodeNr = episode['episode']
           lastEpisode = episode
 
-    result.append({
-      'title': tvshow['title'],
-      'season': ("%.2d" % float(lastEpisode['season'])),
-      'episode': {
-        'number': ("%.2d" % float(lastEpisode['episode'])),
-        'title': lastEpisode['title'],
-        'firstAired': lastEpisode['firstaired'],
-        'episodeDBId': lastEpisode['episodeid']
-      }
-    })
-  return result
+    if lastEpisode != None:
+      tvshowList.append({
+        'title': tvshow['title'],
+        'season': ("%.2d" % float(lastEpisode['season'])),
+        'thumbnail' : tvshow['thumbnail'],
+        'episode': {
+          'number': ("%.2d" % float(lastEpisode['episode'])),
+          'title': lastEpisode['title'],
+          'firstAired': lastEpisode['firstaired'],
+          'episodeDBId': lastEpisode['episodeid']
+        }
+      })
+
+  return tvshowList
 
 
 def display_sort_order_selection():
@@ -89,7 +93,7 @@ def display_episode_list(seriesList):
   for series in seriesList:
     episode = series['episode']
     label = u"S%sE%s - %s (%s, %s)"%(series['season'], episode['number'], series['title'], episode['title'], episode['firstAired'])
-    li = xbmcgui.ListItem(label, iconImage='DefaultFolder.png')
+    li = xbmcgui.ListItem(label, iconImage='DefaultFolder.png', thumbnailImage=xbmc.translatePath(series['thumbnail']))
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=base_url, listitem=li, isFolder=False)
   xbmcplugin.endOfDirectory(addon_handle)
 
@@ -118,3 +122,4 @@ if order:
   display_episode_list(sortedEpisodeList)
 else:
   display_sort_order_selection()
+print get_tv_show_list()
