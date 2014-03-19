@@ -1,3 +1,7 @@
+v1.1.0 (2014-03-19):
+- Replaced sqlite3 with JSON-RPC
+- Added localization for english and german
+
 v1.0.3 (2014-03-13):
 - Icons and fanart
 
