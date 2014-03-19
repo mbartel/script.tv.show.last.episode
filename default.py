@@ -18,13 +18,6 @@ def jsonrpc(method, resultKey, params):
   else:
     return []
 
-def display_episode_list(seriesList):
-  for series in seriesList:
-    episode = series['episode']
-    label = u"S%sE%s - %s (%s, aired: %s, added: %s)"%(series['season'], series['number'], series['title'], episode['title'], episode['firstAired'], episode['dateAdded'][:10])
-    li = xbmcgui.ListItem(label, iconImage='DefaultFolder.png')
-    xbmcplugin.addDirectoryItem(handle=addon_handle, url=base_url, listitem=li, isFolder=False)
-  xbmcplugin.endOfDirectory(addon_handle)
 
 def get_tv_show_list():
   tvshows = jsonrpc('VideoLibrary.GetTVShows', 'tvshows', '{ "properties": ["title", "thumbnail"] }, "id": "libTvShows"}')
@@ -33,20 +26,32 @@ def get_tv_show_list():
     episodes = jsonrpc(
       'VideoLibrary.GetEpisodes',
       'episodes',
-      '{"tvshowid": %d, "properties": ["title", "season", "episode", "thumbnail"], "sort": {"order": "descending", "method": "season"}, "limits": {"start": 1, "end": 1}}'%tvshow['tvshowid']
+      '{"tvshowid": %d, "properties": ["title", "season", "episode", "firstaired", "thumbnail"]}'%tvshow['tvshowid']
     )
-    episode = episodes[0]
+
+    lastSeasonNr = 0
+    lastEpisodeNr = 0
+    for episode in episodes:
+      if (episode['season'] > lastSeasonNr):
+          lastSeasonNr = episode['season']
+          lastEpisodeNr = episode['episode']
+          lastEpisode = episode
+      elif (episode['season'] == lastSeasonNr and episode['episode'] > lastEpisodeNr):
+          lastEpisodeNr = episode['episode']
+          lastEpisode = episode
+
     result.append({
       'title': tvshow['title'],
-      'season': ("%.2d" % float(episode['season'])),
+      'season': ("%.2d" % float(lastEpisode['season'])),
       'episode': {
-        'number': ("%.2d" % float(episode['episode'])),
-        'title': episode['title'],
-        'firstAired': '2014-01-02',
-        'dateAdded': '2014-02-03'
+        'number': ("%.2d" % float(lastEpisode['episode'])),
+        'title': lastEpisode['title'],
+        'firstAired': lastEpisode['firstaired'],
+        'episodeDBId': lastEpisode['episodeid']
       }
     })
   return result
+
 
 def display_sort_order_selection():
   fanart = addon.getAddonInfo('fanart')
@@ -56,7 +61,7 @@ def display_sort_order_selection():
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
     url=base_url + '?order=firstAired',
-    listitem=firstAired, 
+    listitem=firstAired,
     isFolder=True
   )
 
@@ -65,18 +70,27 @@ def display_sort_order_selection():
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
     url=base_url + '?order=seriesTitle',
-    listitem=seriesTitle, 
+    listitem=seriesTitle,
     isFolder=True
   )
 
-  dateAdded = xbmcgui.ListItem(addon.getLocalizedString(32003), iconImage=xbmc.translatePath(path + '/resources/media/plus-circle.png'))
-  dateAdded.setProperty('fanart_image', fanart)
+  episodeDBId = xbmcgui.ListItem(addon.getLocalizedString(32003), iconImage=xbmc.translatePath(path + '/resources/media/plus-circle.png'))
+  episodeDBId.setProperty('fanart_image', fanart)
   xbmcplugin.addDirectoryItem(
     handle=addon_handle,
-    url=base_url + '?order=dateAdded',
-    listitem=dateAdded, 
+    url=base_url + '?order=episodeDBId',
+    listitem=episodeDBId,
     isFolder=True
   )
+  xbmcplugin.endOfDirectory(addon_handle)
+
+
+def display_episode_list(seriesList):
+  for series in seriesList:
+    episode = series['episode']
+    label = u"S%sE%s - %s (%s, %s)"%(series['season'], episode['number'], series['title'], episode['title'], episode['firstAired'])
+    li = xbmcgui.ListItem(label, iconImage='DefaultFolder.png')
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=base_url, listitem=li, isFolder=False)
   xbmcplugin.endOfDirectory(addon_handle)
 
 # check settings
@@ -90,7 +104,7 @@ else:
   if addOnSetting == '2':
     order = 'firstAired'
   if addOnSetting == '3':
-    order = 'dateAdded'
+    order = 'episodeDBId'
 
 # sort tv show list
 if order:
@@ -99,12 +113,8 @@ if order:
     sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['title'])
   if order in 'firstAired':
     sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['episode']['firstAired'], reverse=True)
-  if order in 'dateAdded':
-    sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['episode']['dateAdded'], reverse=True)
+  if order in 'episodeDBId':
+    sortedEpisodeList = sorted(unsortedEpisodeList, key=lambda x: x['episode']['episodeDBId'], reverse=True)
   display_episode_list(sortedEpisodeList)
 else:
   display_sort_order_selection()
-
-print 'before call'
-print get_tv_show_list()
-print 'after call'
