@@ -9,7 +9,7 @@
   </extension>
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
-    <language>en de</language>
+    <language></language>
     <license>MIT</license>
     <source>https://github.com/mbartel/script.tv.show.last.episode</source>
     <website>https://github.com/mbartel/script.tv.show.last.episode</website>
